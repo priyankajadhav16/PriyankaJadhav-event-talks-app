@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tech Talks Today</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        h1 {
+            color: #2c3e50;
+        }
+        #search-container {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        #search-box {
+            width: 50%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .schedule-container {
+            border-left: 3px solid #3498db;
+            padding-left: 20px;
+        }
+        .slot {
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        .slot.break {
+            background-color: #e8f4fd;
+        }
+        .slot-time {
+            font-weight: bold;
+            color: #3498db;
+            margin-bottom: 10px;
+        }
+        .slot-title {
+            font-size: 1.4em;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        .slot-speakers {
+            font-style: italic;
+            color: #555;
+            margin-bottom: 15px;
+        }
+        .slot-categories {
+            margin-bottom: 10px;
+        }
+        .category-tag {
+            display: inline-block;
+            background-color: #ecf0f1;
+            color: #7f8c8d;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            margin-right: 5px;
+        }
+        .slot-description {
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Tech Talks Today</h1>
+        <p>A one-day event filled with exciting technical talks.</p>
+    </header>
+
+    <div id="search-container">
+        <input type="text" id="search-box" placeholder="Search by category (e.g., AI, Web, Cloud)...">
+    </div>
+
+    <div id="schedule" class="schedule-container"></div>
+
+    <script>
+        const talksData = [
+            {
+                title: "The Future of AI in Web Development",
+                speakers: ["Jane Doe"],
+                categories: ["AI", "Web", "JavaScript"],
+                duration: 60,
+                description: "An in-depth look at how artificial intelligence is shaping the future of web development, from automated testing to AI-powered user interfaces."
+            },
+            {
+                title: "Mastering Cloud-Native Security",
+                speakers: ["John Smith", "Emily White"],
+                categories: ["Cloud", "Security", "DevOps"],
+                duration: 60,
+                description: "Learn the best practices for securing your applications in a cloud-native environment, covering topics like container security, IAM, and network policies."
+            },
+            {
+                title: "Deep Dive into Modern CSS",
+                speakers: ["Alex Green"],
+                categories: ["Web", "CSS", "Frontend"],
+                duration: 60,
+                description: "Explore the latest features in CSS, including Grid, Flexbox, and Custom Properties, and how to use them to build complex and responsive layouts."
+            },
+            {
+                title: "Building Scalable APIs with GraphQL",
+                speakers: ["Maria Garcia"],
+                categories: ["API", "GraphQL", "Backend"],
+                duration: 60,
+                description: "A comprehensive guide to designing and building scalable and efficient APIs using GraphQL, with a focus on performance and maintainability."
+            },
+            {
+                title: "The Rise of WebAssembly",
+                speakers: ["Chris Lee", "Ben Carter"],
+                categories: ["Web", "WASM", "Performance"],
+                duration: 60,
+                description: "Discover how WebAssembly is revolutionizing web performance by allowing developers to run high-performance code in the browser."
+            },
+            {
+                title: "Ethical AI: Bias and Fairness",
+                speakers: ["Dr. Sarah Connor"],
+                categories: ["AI", "Ethics"],
+                duration: 60,
+                description: "A critical discussion on the ethical implications of AI, focusing on how to identify and mitigate bias in machine learning models."
+            }
+        ];
+
+        const scheduleElement = document.getElementById('schedule');
+        const searchBox = document.getElementById('search-box');
+
+        function formatTime(date) {
+            return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+        }
+
+        function renderSchedule(filter = '') {
+            scheduleElement.innerHTML = '';
+            let currentTime = new Date();
+            currentTime.setHours(10, 0, 0, 0); // Event starts at 10:00 AM
+
+            const filteredTalks = talksData.filter(talk => 
+                filter === '' || talk.categories.some(cat => cat.toLowerCase().includes(filter.toLowerCase()))
+            );
+
+            let talkCounter = 0;
+            const totalTalks = 6;
+            let lunchTaken = false;
+
+            while(talkCounter < totalTalks) {
+                if (talkCounter === 3 && !lunchTaken) {
+                    const lunchStartTime = new Date(currentTime);
+                    const lunchEndTime = new Date(currentTime);
+                    lunchEndTime.setMinutes(lunchEndTime.getMinutes() + 60);
+                    
+                    const slotDiv = document.createElement('div');
+                    slotDiv.className = 'slot break';
+                    slotDiv.innerHTML = `
+                        <div class="slot-time">${formatTime(lunchStartTime)} - ${formatTime(lunchEndTime)}</div>
+                        <div class="slot-title">Lunch Break</div>
+                    `;
+                    scheduleElement.appendChild(slotDiv);
+                    
+                    currentTime = lunchEndTime;
+                    lunchTaken = true;
+                    continue;
+                }
+                
+                const talk = talksData[talkCounter];
+                
+                if (filteredTalks.includes(talk)) {
+                    const talkStartTime = new Date(currentTime);
+                    const talkEndTime = new Date(currentTime);
+                    talkEndTime.setMinutes(talkEndTime.getMinutes() + talk.duration);
+
+                    const slotDiv = document.createElement('div');
+                    slotDiv.className = 'slot';
+                    slotDiv.innerHTML = `
+                        <div class="slot-time">${formatTime(talkStartTime)} - ${formatTime(talkEndTime)}</div>
+                        <div class="slot-title">${talk.title}</div>
+                        <div class="slot-speakers">By: ${talk.speakers.join(', ')}</div>
+                        <div class="slot-categories">
+                            ${talk.categories.map(cat => `<span class="category-tag">${cat}</span>`).join('')}
+                        </div>
+                        <div class="slot-description">${talk.description}</div>
+                    `;
+                    scheduleElement.appendChild(slotDiv);
+                    currentTime = talkEndTime;
+                } else {
+                     currentTime.setMinutes(currentTime.getMinutes() + talksData[talkCounter].duration);
+                }
+
+                if (talkCounter < totalTalks - 1 && talkCounter !== 2) {
+                     if (filteredTalks.includes(talk)) {
+                        const breakStartTime = new Date(currentTime);
+                        const breakEndTime = new Date(currentTime);
+                        breakEndTime.setMinutes(breakEndTime.getMinutes() + 10);
+                        
+                        const slotDiv = document.createElement('div');
+                        slotDiv.className = 'slot break';
+                        slotDiv.innerHTML = `
+                             <div class="slot-time">${formatTime(breakStartTime)} - ${formatTime(breakEndTime)}</div>
+                            <div class="slot-title">Break</div>
+                        `;
+                        scheduleElement.appendChild(slotDiv);
+                        currentTime = breakEndTime;
+                     } else {
+                        currentTime.setMinutes(currentTime.getMinutes() + 10);
+                     }
+                }
+                talkCounter++;
+            }
+        }
+
+        searchBox.addEventListener('keyup', (e) => {
+            renderSchedule(e.target.value);
+        });
+
+        // Initial render
+        renderSchedule();
+    </script>
+
+</body>
+</html>
